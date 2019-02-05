@@ -3,7 +3,6 @@ import numpy as np
 import gym
 import logging
 import copy
-
 from tensorflow.contrib import layers
 
 
@@ -14,6 +13,7 @@ class Policy(object):
     def act(self, observation):
         # should return act, info
         raise NotImplementedError()
+
 
 class RunningMeanStd(object):
     def __init__(self, scope="running", reuse=False, epsilon=1e-2, shape=()):
@@ -49,6 +49,7 @@ def dense(x, size, name, weight_init=None, bias=True):
     else:
         return ret
 
+
 def switch(condition, if_exp, else_exp):
     x_shape = copy.copy(if_exp.get_shape())
     x = tf.cond(tf.cast(condition, 'bool'),
@@ -72,7 +73,11 @@ class DiagonalGaussian(object):
 
 
 class MlpPolicyValue(Policy):
-    def __init__(self, scope, *, ob_space, ac_space, hiddens, convs=[], reuse=False, normalize=False):
+    def __init__(self, scope, *, ob_space, ac_space, hiddens, convs=[],
+                 reuse=False, normalize=False, sess=None):
+        if sess is None:
+            sess = tf.get_default_session()
+        self.sess = sess
         self.recurrent = False
         self.normalized = normalize
         self.zero_state = np.zeros(1)
@@ -120,7 +125,7 @@ class MlpPolicyValue(Policy):
 
     def act(self, observation, stochastic=True):
         outputs = [self.sampled_action, self.vpred]
-        a, v = tf.get_default_session().run(outputs, {
+        a, v = self.sess.run(outputs, {
             self.observation_ph: observation[None],
             self.stochastic_ph: stochastic})
         return a[0], {'vpred': v[0]}
@@ -133,7 +138,11 @@ class MlpPolicyValue(Policy):
 
 
 class LSTMPolicy(Policy):
-    def __init__(self, scope, *, ob_space, ac_space, hiddens, reuse=False, normalize=False):
+    def __init__(self, scope, *, ob_space, ac_space, hiddens,
+                 reuse=False, normalize=False, sess=None):
+        if sess is None:
+            sess = tf.get_default_session()
+        self.sess = sess
         self.recurrent = True
         self.normalized = normalize
         with tf.variable_scope(scope, reuse=reuse):
@@ -210,7 +219,7 @@ class LSTMPolicy(Policy):
 
     def act(self, observation, stochastic=True):
         outputs = [self.sampled_action, self.vpred, self.state_out]
-        a, v, s = tf.get_default_session().run(outputs, {
+        a, v, s = self.sess.run(outputs, {
             self.observation_ph: observation[None, None],
             self.state_in_ph: list(self.state[:, None, :]),
             self.stochastic_ph: stochastic})
