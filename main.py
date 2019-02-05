@@ -1,6 +1,5 @@
 from policy import LSTMPolicy, MlpPolicyValue
 import gym
-import gym_compete
 import pickle
 import sys
 import argparse
