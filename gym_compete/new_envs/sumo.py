@@ -83,7 +83,6 @@ class SumoEnv(MultiAgentEnv):
             done = True
             for j in range(self.n_agents):
                 if fallen[j]:
-                    print('Agent', j, 'fallen')
                     goal_rews[j] -= self.GOAL_REWARD
                 elif self.agent_contacts:
                     goal_rews[j] += self.GOAL_REWARD
@@ -93,7 +92,6 @@ class SumoEnv(MultiAgentEnv):
             done = True
             for j in range(self.n_agents):
                 if past_arena[j]:
-                    print('Agent', j, 'past arena')
                     goal_rews[j] -= self.GOAL_REWARD
                 elif self.agent_contacts:
                     goal_rews[j] += self.GOAL_REWARD

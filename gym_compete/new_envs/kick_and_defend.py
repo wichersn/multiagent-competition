@@ -120,8 +120,6 @@ class KickAndDefend(MultiAgentEnv):
                 if self.agents[i].team == 'blocker':
                     if np.abs(self.GOAL_X - self.agents[i].get_qpos()[0]) > 2.5:
                         keeper_penalty = True
-                        # print("keeper x:", self.agents[i].get_qpos()[0], "goal_x:", self.GOAL_X)
-                        print("Keeper foul!")
                         break
             if keeper_penalty:
                 done = True
