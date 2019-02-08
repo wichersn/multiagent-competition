@@ -35,7 +35,7 @@ class HumanoidKicker(Humanoid):
 
     def set_goal(self, goal):
         ball_ini_xyz = self.get_ball_qpos()
-        self.GOAL = np.asscalar(ball_ini_xyz[0])
+        self.GOAL = ball_ini_xyz[0].item()
         self.TARGET = goal
         self.move_left = False
         if self.get_qpos()[0] - self.GOAL > 0:
@@ -48,7 +48,7 @@ class HumanoidKicker(Humanoid):
         ball_xy = self.get_ball_qpos()[:2]
         my_xy = self.get_qpos()[:2]
         ball_dist = np.sqrt(np.sum((my_xy - ball_xy)**2))
-        rinfo['reward_goal_dist'] = np.asscalar(ball_dist)
+        rinfo['reward_goal_dist'] = ball_dist.item()
         reward = rinfo['reward_forward'] - rinfo['reward_ctrl'] - rinfo['reward_contact'] + rinfo['reward_survive'] - rinfo['reward_goal_dist']
         rinfo['reward_move'] = reward
         assert np.isfinite(reward), (rinfo, action)

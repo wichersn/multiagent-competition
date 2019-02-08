@@ -130,9 +130,9 @@ class KickAndDefend(MultiAgentEnv):
                 for i in range(self.n_agents):
                     if self.agents[i].team == 'walker':
                         # goal_rews[i] -= np.abs(ball_xyz[0] - self.GOAL_X)
-                        infos[i]['reward_move'] -= np.asscalar(np.abs(ball_xyz[0] - self.GOAL_X))
+                        infos[i]['reward_move'] -= np.abs(ball_xyz[0] - self.GOAL_X).item()
                     else:
-                        infos[i]['reward_move'] += np.asscalar(np.abs(ball_xyz[0] - self.GOAL_X))
+                        infos[i]['reward_move'] += np.abs(ball_xyz[0] - self.GOAL_X).item()
                         # if len(ball_contacts) > 0:
                         #     # ball contact bonus
                         #     print("detected contacts for keeper:", ball_contacts)
