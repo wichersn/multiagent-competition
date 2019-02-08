@@ -12,5 +12,10 @@ setup(name='gym_compete',
       url='https://github.com/HumanCompatibleAI/multiagent-competition',
       python_requires='>=3.6.0',
       packages=find_packages(exclude=('tests',)),
+      package_data={'gym_compete':
+        [
+          'new_envs/assets/*.xml',
+        ],
+      },
       install_requires=read_requirements_file('requirements.txt'),
 )
