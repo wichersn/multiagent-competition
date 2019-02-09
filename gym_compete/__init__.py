@@ -2,7 +2,7 @@ from gym.envs.registration import register
 import os
 
 register(
-    id='multicomp/run-to-goal-ants-v0',
+    id='multicomp/RunToGoalAnts-v0',
     entry_point='gym_compete.new_envs:MultiAgentEnv',
     kwargs={'agent_names': ['ant', 'ant'],
             'scene_xml_path': os.path.join(
@@ -15,7 +15,7 @@ register(
 )
 
 register(
-    id='multicomp/run-to-goal-humans-v0',
+    id='multicomp/RunToGoalHumans-v0',
     entry_point='gym_compete.new_envs:MultiAgentEnv',
     kwargs={'agent_names': ['humanoid', 'humanoid'],
             'scene_xml_path': os.path.join(
@@ -28,7 +28,7 @@ register(
 )
 
 register(
-    id='multicomp/you-shall-not-pass-humans-v0',
+    id='multicomp/YouShallNotPassHumans-v0',
     entry_point='gym_compete.new_envs:HumansBlockingEnv',
     kwargs={'agent_names': ['humanoid_blocker', 'humanoid'],
             'scene_xml_path': os.path.join(
@@ -42,7 +42,7 @@ register(
 )
 
 register(
-    id='multicomp/sumo-humans-v0',
+    id='multicomp/SumoHumans-v0',
     entry_point='gym_compete.new_envs:SumoEnv',
     kwargs={'agent_names': ['humanoid_fighter', 'humanoid_fighter'],
             'scene_xml_path': os.path.join(
@@ -58,7 +58,7 @@ register(
 )
 
 register(
-    id='multicomp/sumo-ants-v0',
+    id='multicomp/SumoAnts-v0',
     entry_point='gym_compete.new_envs:SumoEnv',
     kwargs={'agent_names': ['ant_fighter', 'ant_fighter'],
             'scene_xml_path': os.path.join(
@@ -98,7 +98,7 @@ register(
 # )
 
 register(
-    id='multicomp/kick-and-defend-v0',
+    id='multicomp/KickAndDefend-v0',
     entry_point='gym_compete.new_envs:KickAndDefend',
     kwargs={'agent_names': ['humanoid_kicker', 'humanoid_goalkeeper'], # ['humanoid_goalkeeper', 'humanoid_kicker']
             'scene_xml_path': os.path.join(
