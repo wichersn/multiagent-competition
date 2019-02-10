@@ -15,6 +15,7 @@ setup(name='gym_compete',
       package_data={'gym_compete':
         [
           'new_envs/assets/*.xml',
+          'agent_zoo/*/*.pkl',
         ],
       },
       install_requires=read_requirements_file('requirements.txt'),
