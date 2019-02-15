@@ -1,17 +1,25 @@
-import tensorflow as tf
-import numpy as np
-import gym
-import logging
+"""Abstract policy class and some concrete implementations."""
+
+from abc import ABC, abstractmethod
 import copy
-from tensorflow.contrib import layers
+
+import gym
+import numpy as np
+import tensorflow as tf
 
 
-class Policy(object):
-    def reset(self, **kwargs):
+class Policy(ABC):
+    """Base policy class."""
+    @abstractmethod
+    def reset(self, batch_size):
+        """Reset internal state (if any)."""
         pass
 
-    def act(self, observation):
-        # should return act, info
+    @abstractmethod
+    def act(self, observations):
+        """Computes actions given observations, updating internal state (if any).
+        :param observation(np.ndarray): shape (batch_size, ) + observation_space.shape.
+        :return actions(np.ndarray): shape (batch_size, ) + action_space.shape."""
         raise NotImplementedError()
 
 
@@ -123,12 +131,13 @@ class MlpPolicyValue(Policy):
             self.taken_action_ph: taken_action
         }
 
-    def act(self, observation, stochastic=True):
+    def act(self, observations, stochastic=True):
         outputs = [self.sampled_action, self.vpred]
         a, v = self.sess.run(outputs, {
-            self.observation_ph: observation[None],
-            self.stochastic_ph: stochastic})
-        return a[0], {'vpred': v[0]}
+            self.observation_ph: observations,
+            self.stochastic_ph: stochastic
+        })
+        return a, {'vpred': v}
 
     def get_variables(self):
         return tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, self.scope)
@@ -205,7 +214,7 @@ class LSTMPolicy(Policy):
 
             self.zero_state = np.array(self.zero_state)
             self.state_in_ph = tuple(self.state_in_ph)
-            self.state = self.zero_state
+            self.state = None
 
             for p in self.get_trainable_variables():
                 tf.add_to_collection(tf.GraphKeys.REGULARIZATION_LOSSES, tf.reduce_sum(tf.square(p)))
@@ -217,18 +226,18 @@ class LSTMPolicy(Policy):
             self.taken_action_ph: taken_action
         }
 
-    def act(self, observation, stochastic=True):
+    def act(self, observations, stochastic=True):
         outputs = [self.sampled_action, self.vpred, self.state_out]
         a, v, s = self.sess.run(outputs, {
-            self.observation_ph: observation[None, None],
-            self.state_in_ph: list(self.state[:, None, :]),
+            self.observation_ph: observations[:, None],
+            self.state_in_ph: list(self.state),
             self.stochastic_ph: stochastic})
         self.state = []
         for x in s:
-            self.state.append(x.c[0])
-            self.state.append(x.h[0])
+            self.state.append(x.c)
+            self.state.append(x.h)
         self.state = np.array(self.state)
-        return a[0, 0], {'vpred': v[0, 0], 'state': self.state}
+        return a[:, 0, :], {'vpred': v[:, 0], 'state': self.state}
 
     def get_variables(self):
         return tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, self.scope)
@@ -236,5 +245,5 @@ class LSTMPolicy(Policy):
     def get_trainable_variables(self):
         return tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, self.scope)
 
-    def reset(self):
-        self.state = self.zero_state
+    def reset(self, batch_size):
+        self.state = np.tile(self.zero_state, (batch_size, 1, 1)).swapaxes(0, 1)
