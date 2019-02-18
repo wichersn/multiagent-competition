@@ -113,11 +113,11 @@ class MlpPolicyValue(BasePolicy):
             self.taken_action_ph: taken_action
         }
 
-    def step(self, obs, state=None, mask=None, stochastic=True):
+    def step(self, obs, state=None, mask=None, deterministic=False):
         outputs = [self.sampled_action, self.vpred]
         a, v = self.sess.run(outputs, {
             self.obs_ph: obs,
-            self.stochastic_ph: stochastic
+            self.stochastic_ph: not deterministic,
         })
         return a, v, None, None
 
@@ -207,12 +207,12 @@ class LSTMPolicy(BasePolicy):
             self.taken_action_ph: taken_action
         }
 
-    def step(self, obs, state=None, mask=None, stochastic=True):
+    def step(self, obs, state=None, mask=None, deterministic=False):
         outputs = [self.sampled_action, self.vpred, self.state_out]
         a, v, s = self.sess.run(outputs, {
             self.observation_ph: obs[:, None],
             self.state_in_ph: list(state),
-            self.stochastic_ph: stochastic})
+            self.stochastic_ph: not deterministic})
         state = []
         for x in s:
             state.append(x.c)
